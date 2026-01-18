@@ -12,8 +12,16 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
 # Install system dependencies
 RUN apt-get update && apt-get install -y \
     gcc \
+    g++ \
     ffmpeg \
-    libmysqlclient-dev \
+    libavcodec-dev \
+    libavformat-dev \
+    libavdevice-dev \
+    libavutil-dev \
+    libavfilter-dev \
+    libswscale-dev \
+    libswresample-dev \
+    default-libmysqlclient-dev \
     pkg-config \
     && rm -rf /var/lib/apt/lists/*
 
@@ -27,7 +35,7 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY . .
 
 # Create non-root user for security
-RUN useradd -m -s /bin/bash -u appuser && \
+RUN useradd -m -s /bin/bash appuser && \
     chown -R appuser:appuser /app
 USER appuser
 

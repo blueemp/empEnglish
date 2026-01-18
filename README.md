@@ -59,10 +59,10 @@ empEnglish/
 git clone <repository-url>
 cd empEnglish
 
-# 2. 复制环境变量
+# 2. 复制环境变量（可选，docker-compose.yml已包含基本配置）
 cp .env.example .env
 
-# 3. 编辑.env文件，配置以下参数：
+# 3. 编辑.env文件，配置以下参数（如果需要）：
 #    - 数据库密码
 #    - JWT密钥（生产环境使用强密钥）
 #    - WeChat App ID和Secret
@@ -75,9 +75,21 @@ docker-compose up -d
 # 5. 查看日志
 docker-compose logs -f app
 
-# 6. 访问API文档
+# 6. 检查服务状态
+docker-compose ps
+
+# 7. 访问API文档
 open http://localhost:8000/docs
 ```
+
+### 服务端口映射
+
+| 服务 | 容器端口 | 主机端口 | 说明 |
+|------|-----------|-----------|------|
+| MySQL | 3306 | 3307 | 数据库 |
+| Redis | 6379 | 6379 | 缓存 |
+| MinIO | 9000-9001 | 9000-9001 | 对象存储 |
+| App | 8000 | 8000 | 应用服务 |
 
 ### 本地开发运行
 
@@ -239,17 +251,55 @@ locust -f tests/performance/locustfile.py --headless
 ## 已知限制
 
 1. **AI服务依赖**
-   - Whisper需要GPU才能达到理想性能
-   - edge-tts仅支持英语语音
-   - LLM调用有API速率限制
+    - Whisper需要GPU才能达到理想性能
+    - edge-tts仅支持英语语音
+    - LLM调用有API速率限制
 
 2. **评分准确性**
-   - GOP评分需要高质量音频输入
-   - 语法检测依赖规则引擎，可能遗漏复杂错误
+    - GOP评分需要高质量音频输入
+    - 语法检测依赖规则引擎，可能遗漏复杂错误
 
 3. **并发处理**
-   - WebSocket连接数受限于服务器配置
-   - 长音频文件处理占用大量资源
+    - WebSocket连接数受限于服务器配置
+    - 长音频文件处理占用大量资源
+
+4. **依赖版本兼容性**
+    - `pymilvus==2.3.4` 的 `grpcio` 依赖在某些环境中构建失败
+    - `openai` 库版本需要固定以避免依赖冲突
+    - `pydantic-settings==2.1.0` 的 `Config` 类与 `model_config` 不能同时使用
+
+## 部署状态
+
+✅ **当前状态**: 所有服务正常运行
+
+### 运行中的服务
+
+- ✅ MySQL 8.0 - 数据库服务
+- ✅ Redis 7-alpine - 缓存服务
+- ✅ MinIO - 对象存储服务
+- ✅ empEnglish App - 应用服务 (FastAPI)
+
+### 已验证的端点
+
+- ✅ `GET /health` - 健康检查端点
+  ```json
+  {"status":"healthy","version":"1.0.0","service":"empEnglish"}
+  ```
+
+- ✅ `GET /` - 根路径信息
+  ```json
+  {"service":"empEnglish","description":"AI-powered English oral practice platform","version":"1.0.0","docs":"/docs"}
+  ```
+
+- ✅ `GET /docs` - Swagger API 文档 (http://localhost:8000/docs)
+- ✅ `GET /redoc` - ReDoc API 文档 (http://localhost:8000/redoc)
+
+### 可访问的外部服务
+
+- MinIO 控制台: http://localhost:9001
+  - 用户名: `minioadmin`
+  - 密码: `minioadmin`
+  - 桶: `empenglish-audio`
 
 ## 贡献指南
 
@@ -272,6 +322,22 @@ locust -f tests/performance/locustfile.py --headless
 ---
 
 ## 版本历史
+
+### v1.0.1 (2026-01-18)
+- 修复 Dockerfile 中的 `useradd` 命令参数错误
+- 移除 `docker-compose.yml` 中过时的 `version` 字段
+- 固定依赖版本以避免构建冲突：
+  - `langchain==0.1.20`
+  - `langgraph==0.0.26`
+  - `openai==1.12.0`
+  - `faster-whisper==1.0.3`
+  - `edge-tts==6.1.9`
+  - `locust==2.17.0`
+  - `cryptography==41.0.7`
+- 添加 `email-validator==2.1.0` 依赖
+- 修复 `src/utils/config.py` 中的 Pydantic 配置兼容性问题
+- 暂时注释掉 `pymilvus==2.3.4` (grpcio 构建问题)
+- 成功部署所有服务并验证端点可用性
 
 ### v1.0.0 (2026-01-18)
 - 初始版本

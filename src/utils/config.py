@@ -2,7 +2,7 @@
 
 import os
 from typing import Optional
-from pydantic_settings import BaseSettings
+from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 class Settings(BaseSettings):
@@ -12,6 +12,10 @@ class Settings(BaseSettings):
     APP_NAME: str = "empEnglish"
     APP_VERSION: str = "1.0.0"
     DEBUG: bool = os.getenv("DEBUG", "false").lower() == "true"
+
+    model_config = SettingsConfigDict(
+        extra="ignore"
+    )  # Ignore extra environment variables
 
     # Database
     DATABASE_URL: str = os.getenv(
@@ -62,10 +66,6 @@ class Settings(BaseSettings):
     RATE_LIMIT_PER_MINUTE: int = 100
     RATE_LIMIT_LOGIN_PER_HOUR: int = 10
     RATE_LIMIT_SUBMIT_PER_MINUTE: int = 20
-
-    class Config:
-        env_file = ".env"
-        case_sensitive = False
 
 
 # Global settings instance
