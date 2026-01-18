@@ -1,0 +1,90 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Virtual Environment
+venv/
+env/
+ENV/
+.venv/
+
+# Environment Variables
+.env
+.env.local
+.env.*.local
+
+# Database
+*.db
+*.sqlite3
+*.sqlite
+*.sql
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Logs
+*.log
+logs/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Docker
+docker-compose.override.yml
+
+# Tests
+.coverage
+.pytest_cache/
+htmlcov/
+.tox/
+.hypothesis/
+
+# AI Models (large files)
+*.bin
+*.ckpt
+*.safetensors
+*.onnx
+*.wav
+*.mp3
+*.mp4
+
+# Redis dump
+dump.rdb
+
+# MinIO
+.mc/
+
+# Temporary files
+*.tmp
+*.bak
+*.swp
+*~
+
+# IDE specific
+.spyproject
+.spyderproject
+.ropeproject
+.sublime-project
